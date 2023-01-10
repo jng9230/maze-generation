@@ -1,0 +1,2 @@
+(()=>{"use strict";function e(e){e.preventDefault();var t,n,u=document.querySelector("input[name='firstnumber']"),r=document.querySelector("input[name='secondnumber']"),o=(t=Number(u.value),n=Number(r.value),t-n),c=document.querySelector("p");c&&(c.textContent=o.toString())}var t;console.log("penis"),null==(t=document.querySelector("form"))||t.addEventListener("submit",e),console.log("penis")})();
+//# sourceMappingURL=bundle.js.map
