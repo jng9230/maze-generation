@@ -1,7 +1,7 @@
 // import "./index.css"
-import { subtract } from "./app";
+import { subtract } from "./subtract";
 
-function init() {
+function init_example() {
     const form = document.querySelector("form");
     form?.addEventListener("submit", submitHandler);
 }
@@ -16,4 +16,4 @@ function submitHandler(e: Event) {
         resultElement.textContent = result.toString();
     }
 }
-export {init}
+export {init_example}

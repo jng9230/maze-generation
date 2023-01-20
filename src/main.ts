@@ -1,9 +1,9 @@
 /*
 topmost file that calls everything else
 */
-import {init} from "./index";
+import {init_example} from "./example/example";
 import {generate_maze} from "./maze";
 import "./index.css";
 
-init();
-generate_maze();
+init_example();
+console.log(generate_maze());
