@@ -4,8 +4,8 @@ function generate_maze(){
     //TODO: start and end nodes wrt function args
 
     //initialize the grid 
-    const num_rows = 5
-    const num_cols = 5
+    const num_rows = 10;
+    const num_cols = 10;
     let grid:{[key:string]: number}[][] = new Array(num_rows)
     for (let i = 0; i < num_rows; i++){
         grid[i] = new Array(num_cols)
@@ -43,7 +43,7 @@ function generate_maze(){
         //find node to start from
         const index = choose_index(to_travel)
         const [y, x] = to_travel[index]
-        seen.add([x,y].toString())
+        seen.add([y,x].toString())
 
         //find neighbors that are in bounds and not seen already
         let neigh_arr:{[key:string]:string|number[]}[] = [];
@@ -77,9 +77,9 @@ function generate_maze(){
                 return;
             }
 
-            grid[y][x][dir] = 0;
             const opp = dirs_opp[dir];
-            grid[node[0]][node[1]][opp] = 0;
+            grid[y][x][opp] = 0;
+            grid[node[0]][node[1]][dir] = 0;
             to_travel.push(node);
         }
     }
@@ -91,7 +91,36 @@ function choose_index(n:number[][]){
 }
 
 function to_grid(grid: { [key: string]: number }[][]){
-    
+    //get and set width and height of svg
+    // const wrapper = document.getElementById("maze_wrapper");
+    // const svg = document.createElement("svg");
+    // svg.setAttribute("id", "maze");
+    const svg = document.getElementById("maze");
+    const height = window.innerHeight/2;
+    const width = window.innerWidth;
+    svg.setAttribute("width", `${width}`);
+    svg.setAttribute("height", `${height}`);
+    svg.style.border = "1px solid gray";
+
+    //add in SVG lines to make the maze
+    for (let i = 0; i < grid.length; i++){
+        for (let j = 0; j < grid[0].length; j++) {
+            const square = grid[i][j];
+            for (const [dir, has_wall] of Object.entries(square)) {
+                if (has_wall){
+                    // const line = document.createElement("line");
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', `${(width / grid[0].length)*j}`);
+                    line.setAttribute('y1', `${(width / grid.length) * i}`);
+                    line.setAttribute('x2', `${(width / grid[0].length) * (j+1)}`);
+                    line.setAttribute('y2', `${(width / grid.length) * (i+1)}`);
+                    line.setAttribute("stroke", "black")
+                    line.setAttribute("stroke-width", "1")
+                    svg.append(line);
+                }
+            }
+        }
+    }
 }
 
-export {generate_maze}
+export {generate_maze, to_grid}
