@@ -5,7 +5,7 @@ function generate_maze(){
 
     //initialize the grid 
     const num_rows = 10;
-    const num_cols = 10;
+    const num_cols = 15;
     let grid:{[key:string]: number}[][] = new Array(num_rows)
     for (let i = 0; i < num_rows; i++){
         grid[i] = new Array(num_cols)
@@ -27,8 +27,8 @@ function generate_maze(){
     let seen:Set<string> = new Set(); //set of nodes that have been seen
 
     let dirs_dict:{[key:string]: number[]} = {
-        "U": [0,1],
-        "D": [0,-1],
+        "U": [0, -1],
+        "D": [0, 1],
         "L": [-1, 0],
         "R": [1, 0]
     }
@@ -77,9 +77,10 @@ function generate_maze(){
                 return;
             }
 
+            console.log(`tunneling ${neigh.dir} from [${x}, ${y}] to [${node[1]}, ${node[0]}]`)
             const opp = dirs_opp[dir];
-            grid[y][x][opp] = 0;
-            grid[node[0]][node[1]][dir] = 0;
+            grid[y][x][dir] = 0;
+            grid[node[0]][node[1]][opp] = 0;
             to_travel.push(node);
         }
     }
@@ -98,8 +99,8 @@ function to_grid(grid: { [key: string]: number }[][]){
     const svg = document.getElementById("maze");
     // const height = window.innerHeight/2;
     // const width = window.innerWidth;
-    const height = 500;
-    const width = 500;
+    const height = grid.length*50;
+    const width = grid[0].length*50;
     svg.setAttribute("width", `${width}`);
     svg.setAttribute("height", `${height}`);
     // svg.style.border = "1px solid gray";
@@ -110,9 +111,10 @@ function to_grid(grid: { [key: string]: number }[][]){
         top: 20
     }
 
+    //add in SVG lines to make the maze
+    //have lines based off of different height/width to simulate margins
     const width1 = width - margins.left - margins.right;
     const height1 = height - margins.top - margins.bottom;
-    //add in SVG lines to make the maze
     for (let i = 0; i < grid.length; i++){
         for (let j = 0; j < grid[0].length; j++) {
             const square = grid[i][j];
