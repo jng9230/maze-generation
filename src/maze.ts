@@ -96,28 +96,62 @@ function to_grid(grid: { [key: string]: number }[][]){
     // const svg = document.createElement("svg");
     // svg.setAttribute("id", "maze");
     const svg = document.getElementById("maze");
-    const height = window.innerHeight/2;
-    const width = window.innerWidth;
+    // const height = window.innerHeight/2;
+    // const width = window.innerWidth;
+    const height = 500;
+    const width = 500;
     svg.setAttribute("width", `${width}`);
     svg.setAttribute("height", `${height}`);
-    svg.style.border = "1px solid gray";
+    // svg.style.border = "1px solid gray";
+    const margins = {
+        left: 20,
+        right: 20,
+        bottom: 20,
+        top: 20
+    }
 
+    const width1 = width - margins.left - margins.right;
+    const height1 = height - margins.top - margins.bottom;
     //add in SVG lines to make the maze
     for (let i = 0; i < grid.length; i++){
         for (let j = 0; j < grid[0].length; j++) {
             const square = grid[i][j];
             for (const [dir, has_wall] of Object.entries(square)) {
-                if (has_wall){
-                    // const line = document.createElement("line");
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', `${(width / grid[0].length)*j}`);
-                    line.setAttribute('y1', `${(width / grid.length) * i}`);
-                    line.setAttribute('x2', `${(width / grid[0].length) * (j+1)}`);
-                    line.setAttribute('y2', `${(width / grid.length) * (i+1)}`);
-                    line.setAttribute("stroke", "black")
-                    line.setAttribute("stroke-width", "1")
-                    svg.append(line);
+                if (!has_wall){
+                    continue;
                 }
+                // const line = document.createElement("line");
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                if (dir == "U"){
+                    line.setAttribute('x1', `${(width1 / grid[0].length)*j}`);
+                    line.setAttribute('y1', `${(height1 / grid.length) * i}`);
+                    line.setAttribute('x2', `${(width1 / grid[0].length) * (j+1)}`);
+                    line.setAttribute('y2', `${(height1 / grid.length) * i}`);
+                } else if (dir == "D"){
+                    line.setAttribute('x1', `${(width1 / grid[0].length) * j}`);
+                    line.setAttribute('y1', `${(height1 / grid.length) * (i+1)}`);
+                    line.setAttribute('x2', `${(width1 / grid[0].length) * (j + 1)}`);
+                    line.setAttribute('y2', `${(height1 / grid.length) * (i+1)}`)
+                } else if (dir == "L") {
+                    line.setAttribute('x1', `${(width1 / grid[0].length) * j}`);
+                    line.setAttribute('y1', `${(height1 / grid.length) * i}`);
+                    line.setAttribute('x2', `${(width1 / grid[0].length) * j}`);
+                    line.setAttribute('y2', `${(height1 / grid.length) * (i+1)}`)
+                } else if (dir == "R") {
+                    line.setAttribute('x1', `${(width1 / grid[0].length) * (j+1)}`);
+                    line.setAttribute('y1', `${(height1 / grid.length) * i}`);
+                    line.setAttribute('x2', `${(width1 / grid[0].length) * (j+1)}`);
+                    line.setAttribute('y2', `${(height1 / grid.length) * (i+1)}`)
+                }
+
+                //add margins for lines 
+                line.setAttribute("x1", `${parseFloat(line.getAttribute("x1")) + margins.left}`);
+                line.setAttribute("x2", `${parseFloat(line.getAttribute("x2")) + margins.left}`);
+                line.setAttribute("y1", `${parseFloat(line.getAttribute("y1")) + margins.top}`);
+                line.setAttribute("y2", `${parseFloat(line.getAttribute("y2")) + margins.top}`);
+                line.setAttribute("stroke", "black")
+                line.setAttribute("stroke-width", "1")
+                svg.append(line);
             }
         }
     }
