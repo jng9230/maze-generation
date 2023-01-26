@@ -1,7 +1,7 @@
 /*
 topmost file that calls everything else
 */
-import {Maze} from "./maze";
+// import {Maze} from "./maze";
 import {ResponsiveMaze} from "./responsive_maze"
 
 window.onload = () => {
