@@ -5,6 +5,8 @@ class Maze {
     grid:{[key:string]:number}[][];
     rows:number;
     cols: number;
+    width: number;
+    height: number;
     square_size: number;
     margins: {
         left: number;
@@ -15,6 +17,7 @@ class Maze {
 
     start:number[];
     end:number[];
+    path_to_end: number[][];
 
     wall_thickness:number;
     wall_color:string;
@@ -53,7 +56,16 @@ class Maze {
             }
             this.grid = grid;
 
+            
             this.square_size = square_size;
+            const svg = document.getElementById("maze");
+            const height = this.rows * this.square_size;
+            const width = this.cols * this.square_size;
+            svg.setAttribute("width", `${width}`);
+            svg.setAttribute("height", `${height}`);
+            this.height = height;
+            this.width = width;
+
             this.start = start;
             this.end = end;
             this.margins = margins;
@@ -106,6 +118,13 @@ class Maze {
                         "dir": dir,
                         "node": possible_neigh
                     })
+
+                    //if neigh is end node, update the path there
+                    if (possible_neigh[0] == this.end[0] &&
+                        possible_neigh[1] == this.end[1]){
+                            //use map for shallow copy -- JS copies by reference o.w.
+                            this.path_to_end = [...to_travel, this.end].map((d) => d); 
+                        }
                 }
             }
 
@@ -137,11 +156,13 @@ class Maze {
         const svg = document.getElementById("maze");
         // const height = window.innerHeight/2;
         // const width = window.innerWidth;
-        const height = this.rows * this.square_size;
-        const width = this.cols * this.square_size;
-        svg.setAttribute("width", `${width}`);
-        svg.setAttribute("height", `${height}`);
+        // const height = this.rows * this.square_size;
+        // const width = this.cols * this.square_size;
+        // svg.setAttribute("width", `${width}`);
+        // svg.setAttribute("height", `${height}`);
         const margins = this.margins;
+        const height = this.height;
+        const width = this.width;
 
         //add in SVG lines to make the maze
         //have lines based off of different height/width to simulate margins
@@ -189,6 +210,28 @@ class Maze {
                 }
             }
         }
+    }
+
+    highlight_path(){
+        //the "positional" width of the SVG is with margins and whatnot
+        const width1 = this.width - this.margins.left - this.margins.right;
+        const height1 = this.height - this.margins.top - this.margins.bottom;
+        const x_factor = width1/this.cols;
+        const y_factor = height1/this.rows;
+        const r = 5
+        this.path_to_end.map(d => {
+            const x = d[1];
+            const y = d[0];
+
+            //add to SVG 
+            const svg = document.getElementById("maze");
+            let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttributeNS(null, 'cx', `${(x*x_factor) + this.square_size - r}`);
+            circle.setAttributeNS(null, 'cy', `${(y*y_factor) + this.square_size - r}`);
+            circle.setAttributeNS(null, 'r', `${r}`);
+            circle.setAttributeNS(null, 'style', 'fill: none; stroke: green; stroke-width: 2px;');
+            svg.append(circle);
+        })
     }
 }
 

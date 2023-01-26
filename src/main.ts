@@ -7,10 +7,6 @@ import "./index.css";
 
 init_example();
 window.onload = () => {
-    // const grid = generate_maze();
-    // console.log(grid);
-    // to_grid(grid)
-
     const maze = new Maze(10,15,50);
-
+    maze.highlight_path();
 }
