@@ -1,6 +1,5 @@
 // import { times } from "lodash";
 import "./maze.css"
-
 class Maze {
     grid:{[key:string]:number}[][];
     rows:number;
@@ -75,7 +74,7 @@ class Maze {
             this.grid_to_svg();
     }
 
-    /** Runs an algorithm to generate the maze and saves it
+    /** Runs the growing tree algorithm to generate the maze and saves it
      * into the .grid property
      */
     generate_grid(){
@@ -150,24 +149,20 @@ class Maze {
         return n.length - 1
     }
 
+    /** Draws the maze onto the document's SVG */
     grid_to_svg(){
         //get and set width and height of svg
         const grid = this.grid;
         const svg = document.getElementById("maze");
-        // const height = window.innerHeight/2;
-        // const width = window.innerWidth;
-        // const height = this.rows * this.square_size;
-        // const width = this.cols * this.square_size;
-        // svg.setAttribute("width", `${width}`);
-        // svg.setAttribute("height", `${height}`);
         const margins = this.margins;
         const height = this.height;
         const width = this.width;
-
-        //add in SVG lines to make the maze
+        
         //have lines based off of different height/width to simulate margins
         const width1 = width - margins.left - margins.right;
         const height1 = height - margins.top - margins.bottom;
+        
+        //add in SVG lines to make the maze
         for (let i = 0; i < grid.length; i++) {
             for (let j = 0; j < grid[0].length; j++) {
                 const square = grid[i][j];
@@ -175,28 +170,30 @@ class Maze {
                     if (!has_wall) {
                         continue;
                     }
-                    // const line = document.createElement("line");
+
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    const width_factor = width1 / grid[0].length;
+                    const height_factor = height1 / grid.length;
                     if (dir == "U") {
-                        line.setAttribute('x1', `${(width1 / grid[0].length) * j}`);
-                        line.setAttribute('y1', `${(height1 / grid.length) * i}`);
-                        line.setAttribute('x2', `${(width1 / grid[0].length) * (j + 1)}`);
-                        line.setAttribute('y2', `${(height1 / grid.length) * i}`);
+                        line.setAttribute('x1', `${(width_factor) * j}`);
+                        line.setAttribute('y1', `${(height_factor) * i}`);
+                        line.setAttribute('x2', `${(width_factor) * (j + 1)}`);
+                        line.setAttribute('y2', `${(height_factor) * i}`);
                     } else if (dir == "D") {
-                        line.setAttribute('x1', `${(width1 / grid[0].length) * j}`);
-                        line.setAttribute('y1', `${(height1 / grid.length) * (i + 1)}`);
-                        line.setAttribute('x2', `${(width1 / grid[0].length) * (j + 1)}`);
-                        line.setAttribute('y2', `${(height1 / grid.length) * (i + 1)}`)
+                        line.setAttribute('x1', `${(width_factor) * j}`);
+                        line.setAttribute('y1', `${(height_factor) * (i + 1)}`);
+                        line.setAttribute('x2', `${(width_factor) * (j + 1)}`);
+                        line.setAttribute('y2', `${(height_factor) * (i + 1)}`)
                     } else if (dir == "L") {
-                        line.setAttribute('x1', `${(width1 / grid[0].length) * j}`);
-                        line.setAttribute('y1', `${(height1 / grid.length) * i}`);
-                        line.setAttribute('x2', `${(width1 / grid[0].length) * j}`);
-                        line.setAttribute('y2', `${(height1 / grid.length) * (i + 1)}`)
+                        line.setAttribute('x1', `${(width_factor) * j}`);
+                        line.setAttribute('y1', `${(height_factor) * i}`);
+                        line.setAttribute('x2', `${(width_factor) * j}`);
+                        line.setAttribute('y2', `${(height_factor) * (i + 1)}`)
                     } else if (dir == "R") {
-                        line.setAttribute('x1', `${(width1 / grid[0].length) * (j + 1)}`);
-                        line.setAttribute('y1', `${(height1 / grid.length) * i}`);
-                        line.setAttribute('x2', `${(width1 / grid[0].length) * (j + 1)}`);
-                        line.setAttribute('y2', `${(height1 / grid.length) * (i + 1)}`)
+                        line.setAttribute('x1', `${(width_factor) * (j + 1)}`);
+                        line.setAttribute('y1', `${(height_factor) * i}`);
+                        line.setAttribute('x2', `${(width_factor) * (j + 1)}`);
+                        line.setAttribute('y2', `${(height_factor) * (i + 1)}`)
                     }
 
                     //add margins for lines 
@@ -204,21 +201,22 @@ class Maze {
                     line.setAttribute("x2", `${parseFloat(line.getAttribute("x2")) + margins.left}`);
                     line.setAttribute("y1", `${parseFloat(line.getAttribute("y1")) + margins.top}`);
                     line.setAttribute("y2", `${parseFloat(line.getAttribute("y2")) + margins.top}`);
-                    line.setAttribute("stroke", "black")
-                    line.setAttribute("stroke-width", "1")
+                    line.setAttribute("stroke", this.wall_color)
+                    line.setAttribute("stroke-width", `${this.wall_thickness}`)
                     svg.append(line);
                 }
             }
         }
     }
 
+    /** Highlights the path from the start to the end of the maze with circles */
     highlight_path(){
         //the "positional" width of the SVG is with margins and whatnot
         const width1 = this.width - this.margins.left - this.margins.right;
         const height1 = this.height - this.margins.top - this.margins.bottom;
         const x_factor = width1/this.cols;
         const y_factor = height1/this.rows;
-        const r = 5
+        const r = 4
         this.path_to_end.map(d => {
             const x = d[1];
             const y = d[0];
@@ -226,11 +224,12 @@ class Maze {
             //add to SVG 
             const svg = document.getElementById("maze");
             let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            circle.setAttributeNS(null, 'cx', `${(x*x_factor) + this.square_size - r}`);
-            circle.setAttributeNS(null, 'cy', `${(y*y_factor) + this.square_size - r}`);
+            circle.setAttributeNS(null, 'cx', `${(x*x_factor) + (this.square_size/2) + this.margins.left}`);
+            circle.setAttributeNS(null, 'cy', `${(y*y_factor) + (this.square_size/2) + this.margins.top}`);
             circle.setAttributeNS(null, 'r', `${r}`);
             circle.setAttributeNS(null, 'style', 'fill: none; stroke: green; stroke-width: 2px;');
             svg.append(circle);
+
         })
     }
 }
