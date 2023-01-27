@@ -4,6 +4,8 @@ This is a Typescript implementation of Jamis Buck's ["Growing Tree"](https://web
 
 A responsive version of the maze generator is included that automatically adjusts the maze's dimensions to fill the parent container (e.g.: a full width, full height div).
 
+![maze](./maze.png)
+
 ### To run:
 1.  `npm install` 
 2. `npm run develop`
